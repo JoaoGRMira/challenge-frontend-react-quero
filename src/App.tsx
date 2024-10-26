@@ -31,6 +31,9 @@ const App: React.FC = () => {
     const [error, setError] = useState<string | null>(null); // state for error handling
     const [searchTerm, setSearchTerm] = useState(""); // state for search term
     const [filteredOffers, setFilteredOffers] = useState<Offer[]>([]); // state for filtered offers
+    const [orderBy, setOrderBy] = useState<"course-name" | "price" | "rating">(
+        "course-name"
+    ); // state for order by rating, price or name
 
     useEffect(() => {
         // fetch offers from api on component mount
@@ -76,6 +79,25 @@ const App: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        // logic to filter and sort offers
+        let sortedOffers = [...offers];
+
+        // sort based on orderby
+        if (orderBy === "course-name") {
+            sortedOffers.sort((a, b) =>
+                a.courseName.localeCompare(b.courseName)
+            ); // sort by course name
+        } else if (orderBy === "price") {
+            sortedOffers.sort((a, b) => a.offeredPrice - b.offeredPrice); // sort by offered price
+        } else if (orderBy === "rating") {
+            sortedOffers.sort((a, b) => b.rating - a.rating); // sort by rating
+        }
+
+        // set filtered offers based on sorting
+        setFilteredOffers(sortedOffers);
+    }, [offers, orderBy]); // re-run sorting when offers or orderby changes
+
     return (
         <QLayout
             header={
@@ -99,7 +121,12 @@ const App: React.FC = () => {
         >
             <QSectionForm
                 title="Veja as opções que encontramos"
-                orderBy={<QFormOrderByOffer />}
+                orderBy={
+                    <QFormOrderByOffer
+                        setOrderBy={setOrderBy}
+                        orderBy={orderBy}
+                    />
+                } // pass orderby to control checked state
                 filter={<QFormFilterOffer />}
             />
 
