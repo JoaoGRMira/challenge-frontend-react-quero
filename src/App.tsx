@@ -30,10 +30,17 @@ const App: React.FC = () => {
     const [loading, setLoading] = useState(true); // state for managing data loading
     const [error, setError] = useState<string | null>(null); // state for error handling
     const [searchTerm, setSearchTerm] = useState(""); // state for search term
-    const [filteredOffers, setFilteredOffers] = useState<Offer[]>([]); // state for filtered offers
+    const [ordenedOffers, setOrdenedOffers] = useState<Offer[]>([]); // state for ordened offers
     const [orderBy, setOrderBy] = useState<"course-name" | "price" | "rating">(
         "course-name"
     ); // state for order by rating, price or name
+    const [filters, setFilters] = useState<{
+        levels: string[];
+        kinds: string[];
+    }>({
+        levels: [],
+        kinds: [],
+    }); // state for filtered offers
 
     useEffect(() => {
         // fetch offers from api on component mount
@@ -50,7 +57,7 @@ const App: React.FC = () => {
 
                 const data: Offer[] = await response.json();
                 setOffers(data); // initialize offers
-                setFilteredOffers(data); // initialize filtered offers
+                setOrdenedOffers(data); // initialize ordened offers
             } catch (error) {
                 // if fetch fails, set error message state
                 setError(
@@ -66,7 +73,7 @@ const App: React.FC = () => {
 
     const handleSearch = () => {
         if (searchTerm.trim() === "") {
-            setFilteredOffers(offers); // if search term is empty, show all available offers
+            setOrdenedOffers(offers); // if search term is empty, show all available offers
         } else {
             const lowerCaseSearchTerm = searchTerm.toLowerCase();
 
@@ -75,7 +82,7 @@ const App: React.FC = () => {
                 offer.courseName.toLowerCase().includes(lowerCaseSearchTerm)
             );
 
-            setFilteredOffers(filtered); // set filtered offers based on search term
+            setOrdenedOffers(filtered); // set filtered offers based on search term
         }
     };
 
@@ -94,9 +101,33 @@ const App: React.FC = () => {
             sortedOffers.sort((a, b) => b.rating - a.rating); // sort by rating
         }
 
-        // set filtered offers based on sorting
-        setFilteredOffers(sortedOffers);
+        // set ordened offers based on sorting
+        setOrdenedOffers(sortedOffers);
     }, [offers, orderBy]); // re-run sorting when offers or orderby changes
+
+    const applyFilters = () => {
+        let filtered = offers;
+
+        // filter by level
+        if (filters.levels.length > 0) {
+            filtered = filtered.filter((offer) =>
+                filters.levels.includes(offer.level)
+            );
+        }
+
+        // filter by kind
+        if (filters.kinds.length > 0) {
+            filtered = filtered.filter((offer) =>
+                filters.kinds.includes(offer.kind)
+            );
+        }
+
+        setOrdenedOffers(filtered);
+    };
+
+    useEffect(() => {
+        applyFilters(); // aply filters always when offers or filters changes
+    }, [offers, filters]);
 
     return (
         <QLayout
@@ -116,7 +147,7 @@ const App: React.FC = () => {
                     </QButton>
                 </QHeader>
             }
-            sidebar={<QFormFilterOffer />}
+            sidebar={<QFormFilterOffer onFilterChange={setFilters} />} // call function to manage filters
             footer={<QFooter />}
         >
             <QSectionForm
@@ -127,7 +158,7 @@ const App: React.FC = () => {
                         orderBy={orderBy}
                     />
                 } // pass orderby to control checked state
-                filter={<QFormFilterOffer />}
+                filter={<QFormFilterOffer onFilterChange={setFilters} />}
             />
 
             <div className="mt-6">
@@ -139,7 +170,7 @@ const App: React.FC = () => {
                     <p className="text-red-500">{error}</p>
                 ) : (
                     // render list of offer cards when loaded
-                    <QListCard cards={filteredOffers}>
+                    <QListCard cards={ordenedOffers}>
                         {(card) => (
                             <QCardOffer
                                 key={card.id}

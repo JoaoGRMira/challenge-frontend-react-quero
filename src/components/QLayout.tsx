@@ -21,23 +21,21 @@ const QLayout: FC<QLayoutProps> = ({ sidebar, header, children, footer }) => {
             </div>
 
             {/* main content area with padding to account for header and footer height */}
-            <div className="max-w-screen-2xl mx-auto w-full pt-20 flex-1 pb-20 mb-10">
+            <div className="max-w-screen-2xl mx-auto w-full pt-20 flex-1 pb-10">
                 {/* sidebar width = 220px. main content fill the remainder */}
                 <QRow
                     sidebar={
-                        <aside className="w-220px pr-8 border-r py-6 h-full">
+                        <aside className="w-220px pr-8 border-r pt-6 h-full">
                             {sidebar}
                         </aside>
                     }
                 >
-                    <main className="py-6">{children}</main>
+                    <main className="pt-6">{children}</main>
                 </QRow>
             </div>
 
             {/* fixed footer at the bottom */}
-            <footer className="fixed bottom-0 left-0 right-0 border-t bg-white z-10">
-                {footer}
-            </footer>
+            <footer className="border-t bg-white z-10">{footer}</footer>
         </div>
     );
 };
