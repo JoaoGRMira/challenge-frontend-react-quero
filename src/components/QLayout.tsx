@@ -21,7 +21,7 @@ const QLayout: FC<QLayoutProps> = ({ sidebar, header, children, footer }) => {
             </div>
 
             {/* main content area with padding to account for header and footer height */}
-            <div className="max-w-screen-2xl mx-auto w-full pt-20 flex-1 pb-20">
+            <div className="max-w-screen-2xl mx-auto w-full pt-20 flex-1 pb-20 mb-10">
                 {/* sidebar width = 220px. main content fill the remainder */}
                 <QRow
                     sidebar={

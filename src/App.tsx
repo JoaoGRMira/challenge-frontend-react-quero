@@ -38,14 +38,18 @@ const App: React.FC = () => {
 
                 // handle error responses
                 if (!response.ok) {
-                    throw new Error(`Erro ao carregar ofertas: ${response.statusText}`);
+                    throw new Error(
+                        `Erro ao carregar ofertas: ${response.statusText}`
+                    );
                 }
 
                 const data: Offer[] = await response.json();
                 setOffers(data); // update offers state with fetched data
             } catch (error) {
                 // if fetch fails, set error message state
-                setError("Não foi possível carregar as ofertas. Tente novamente mais tarde.");
+                setError(
+                    "Não foi possível carregar as ofertas. Tente novamente mais tarde."
+                );
             } finally {
                 setLoading(false); // after fetching, set loading to false
             }
