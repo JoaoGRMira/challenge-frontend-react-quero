@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import QHeader from "./components/QHeader";
 import QInput from "./components/QInput";
@@ -11,8 +11,48 @@ import QFormOrderByOffer from "./components/QFormOrderByOffer";
 import QFormFilterOffer from "./components/QFormFilterOffer";
 import QSectionForm from "./components/QSectionForm";
 
+// define the offer interface for data consistency and type checking
+interface Offer {
+    id: string;
+    courseName: string;
+    rating: number;
+    fullPrice: number;
+    offeredPrice: number;
+    discount?: string; // discount value is optional
+    kind: string;
+    level: string;
+    iesLogo: string;
+    iesName: string;
+}
+
 const App: React.FC = () => {
-    const [offers] = useState([]);
+    const [offers, setOffers] = useState<Offer[]>([]); // state for managing offers returned by request
+    const [loading, setLoading] = useState(true); // state for managing data loading
+    const [error, setError] = useState<string | null>(null); // state for error handling
+
+    useEffect(() => {
+        // fetch offers from api on component mount
+        const fetchOffers = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/offers");
+
+                // handle error responses
+                if (!response.ok) {
+                    throw new Error(`Erro ao carregar ofertas: ${response.statusText}`);
+                }
+
+                const data: Offer[] = await response.json();
+                setOffers(data); // update offers state with fetched data
+            } catch (error) {
+                // if fetch fails, set error message state
+                setError("Não foi possível carregar as ofertas. Tente novamente mais tarde.");
+            } finally {
+                setLoading(false); // after fetching, set loading to false
+            }
+        };
+
+        fetchOffers(); // initiate fetch function on mount
+    }, []);
 
     return (
         <QLayout
@@ -38,22 +78,31 @@ const App: React.FC = () => {
             />
 
             <div className="mt-6">
-                <QListCard cards={offers}>
-                    {(card) => (
-                        <QCardOffer
-                            key={card.id}
-                            courseName={card.courseName}
-                            rating={card.rating}
-                            fullPrice={String(card.fullPrice)}
-                            offeredPrice={String(card.offeredPrice)}
-                            discount={String(card.discount)}
-                            kind={card.kind}
-                            level={card.level}
-                            iesLogo={card.iesLogo}
-                            iesName={card.iesName}
-                        />
-                    )}
-                </QListCard>
+                {loading ? (
+                    // loading state message
+                    <p>Carregando ofertas...</p>
+                ) : error ? (
+                    // message display in case of error
+                    <p className="text-red-500">{error}</p>
+                ) : (
+                    // render list of offer cards when loaded
+                    <QListCard cards={offers}>
+                        {(card) => (
+                            <QCardOffer
+                                key={card.id}
+                                courseName={card.courseName}
+                                rating={card.rating}
+                                fullPrice={String(card.fullPrice)}
+                                offeredPrice={String(card.offeredPrice)}
+                                discount={String(card.discount ?? "")} // optional discount value
+                                kind={card.kind}
+                                level={card.level}
+                                iesLogo={card.iesLogo}
+                                iesName={card.iesName}
+                            />
+                        )}
+                    </QListCard>
+                )}
             </div>
         </QLayout>
     );
