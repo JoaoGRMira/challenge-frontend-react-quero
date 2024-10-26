@@ -29,6 +29,8 @@ const App: React.FC = () => {
     const [offers, setOffers] = useState<Offer[]>([]); // state for managing offers returned by request
     const [loading, setLoading] = useState(true); // state for managing data loading
     const [error, setError] = useState<string | null>(null); // state for error handling
+    const [searchTerm, setSearchTerm] = useState(""); // state for search term
+    const [filteredOffers, setFilteredOffers] = useState<Offer[]>([]); // state for filtered offers
 
     useEffect(() => {
         // fetch offers from api on component mount
@@ -44,7 +46,8 @@ const App: React.FC = () => {
                 }
 
                 const data: Offer[] = await response.json();
-                setOffers(data); // update offers state with fetched data
+                setOffers(data); // initialize offers
+                setFilteredOffers(data); // initialize filtered offers
             } catch (error) {
                 // if fetch fails, set error message state
                 setError(
@@ -58,6 +61,21 @@ const App: React.FC = () => {
         fetchOffers(); // initiate fetch function on mount
     }, []);
 
+    const handleSearch = () => {
+        if (searchTerm.trim() === "") {
+            setFilteredOffers(offers); // if search term is empty, show all available offers
+        } else {
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+            // check if the course name contains the search term
+            const filtered = offers.filter((offer) =>
+                offer.courseName.toLowerCase().includes(lowerCaseSearchTerm)
+            );
+
+            setFilteredOffers(filtered); // set filtered offers based on search term
+        }
+    };
+
     return (
         <QLayout
             header={
@@ -68,8 +86,12 @@ const App: React.FC = () => {
                         name="q"
                         placeholder="Busque o curso ideal para você"
                         aria-label="Buscar cursos e bolsas"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)} // capture input value
                     />
-                    <QButton type="submit">Buscar</QButton>
+                    <QButton type="button" onClick={handleSearch}>
+                        Buscar
+                    </QButton>
                 </QHeader>
             }
             sidebar={<QFormFilterOffer />}
@@ -90,7 +112,7 @@ const App: React.FC = () => {
                     <p className="text-red-500">{error}</p>
                 ) : (
                     // render list of offer cards when loaded
-                    <QListCard cards={offers}>
+                    <QListCard cards={filteredOffers}>
                         {(card) => (
                             <QCardOffer
                                 key={card.id}
