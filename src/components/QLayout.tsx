@@ -35,7 +35,7 @@ const QLayout: FC<QLayoutProps> = ({ sidebar, header, children, footer }) => {
             </div>
 
             {/* fixed footer at the bottom */}
-            <footer className="border-t bg-white z-10">{footer}</footer>
+            <footer className="border-t bg-white">{footer}</footer>
         </div>
     );
 };

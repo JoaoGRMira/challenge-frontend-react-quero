@@ -16,7 +16,7 @@ const QBottomSheet: FC<QBottomSheetProps> = ({ open, onClose, children }) => {
             />
 
             <DialogPanel
-                className="fixed inset-x-0 bottom-0 bg-white p-4 rounded-t-xl max-w-lg mx-auto ease duration-300 data-[closed]:translate-y-full"
+                className="fixed inset-x-0 bottom-0 bg-white p-4 rounded-t-xl max-w-lg mx-auto ease duration-300 data-[closed]:translate-y-full z-20"
                 transition
             >
                 {children}
