@@ -10,26 +10,32 @@ type QLayoutProps = {
 
 const QLayout: FC<QLayoutProps> = ({ sidebar, header, children, footer }) => {
     return (
+        // full height container and flex column layout
         <div className="min-h-screen flex flex-col">
+            {/* bottom border to separate header from content */}
             <div className="border-b">
-                <header className="max-w-screen-2xl mx-auto w-full">
+                {/* fixed header at the top */}
+                <header className="fixed top-0 left-0 max-w-screen-2xl mx-auto w-full bg-white z-10">
                     {header}
                 </header>
             </div>
 
-            <div className="max-w-screen-2xl mx-auto w-full">
+            {/* main content area with padding to account for header and footer height */}
+            <div className="max-w-screen-2xl mx-auto w-full pt-20 flex-1 pb-10">
+                {/* sidebar width = 220px. main content fill the remainder */}
                 <QRow
                     sidebar={
-                        <aside className="pr-8 border-r py-6 h-full">
+                        <aside className="w-220px pr-8 border-r pt-6 h-full">
                             {sidebar}
                         </aside>
                     }
                 >
-                    <main className="py-6">{children}</main>
+                    <main className="pt-6">{children}</main>
                 </QRow>
             </div>
 
-            <footer className="border-t">{footer}</footer>
+            {/* fixed footer at the bottom */}
+            <footer className="border-t bg-white z-10">{footer}</footer>
         </div>
     );
 };
