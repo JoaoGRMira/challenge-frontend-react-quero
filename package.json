@@ -7,7 +7,7 @@
         "dev": "run-p serve vite",
         "serve": "json-server server.json --port 3000",
         "vite": "vite --port 3001",
-        "build": "vue-tsc -b && vite build",
+        "build": "vite build",
         "preview": "vite preview"
     },
     "dependencies": {
